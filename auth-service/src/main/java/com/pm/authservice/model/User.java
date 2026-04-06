@@ -28,8 +28,8 @@ public class User {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, columnDefinition = "TEXT")
-    private String passwordHash;
+    @Column(name = "password", nullable = false, columnDefinition = "TEXT")
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -41,4 +41,7 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
 }
