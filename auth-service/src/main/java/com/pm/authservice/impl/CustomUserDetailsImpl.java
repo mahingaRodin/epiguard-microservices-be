@@ -1,7 +1,8 @@
-package com.pm.authservice.security;
+package com.pm.authservice.impl;
 
 import com.pm.authservice.model.User;
 import com.pm.authservice.repository.UserRepository;
+import com.pm.authservice.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
-    private final UserRepository userRepository;  // @Autowired is redundant with @RequiredArgsConstructor
+public class CustomUserDetailsImpl implements UserDetailsService {
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
