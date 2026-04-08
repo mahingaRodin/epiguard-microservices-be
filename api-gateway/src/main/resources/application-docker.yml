@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service-route
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user-service-route
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - JwtValidation
