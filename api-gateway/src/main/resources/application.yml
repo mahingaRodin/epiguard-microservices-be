@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service-route
+          uri: http://localhost:4005
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user-service-route
+          uri: http://localhost:4005
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - JwtValidation
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
