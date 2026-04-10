@@ -18,14 +18,26 @@ spring:
           filters:
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 5 # Allow 5 requests per second
-                redis-rate-limiter.burstCapacity: 10 # Allow a sudden burst of up to 10
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
                 key-resolver: "#{@userKeyResolver}"
 
         - id: user-service-route
           uri: http://localhost:4005
           predicates:
             - Path=/api/users/**
+          filters:
+            - JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
+
+        - id: patient-service-route
+          uri: http://localhost:4001
+          predicates:
+            - Path=/api/patients/**, /api/symptoms/**
           filters:
             - JwtValidation
             - name: RequestRateLimiter
