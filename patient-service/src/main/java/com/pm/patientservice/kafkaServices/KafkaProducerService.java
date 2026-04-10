@@ -15,7 +15,7 @@ public class KafkaProducerService {
     private static final String TOPIC = "symptom-events";
 
     public void sendSymptomEvent(SymptomEvent event) {
-        log.info("Publishing symptom even for patient {} in district", event.getPatient_id(), event.getDistrict());
+        log.info("Publishing symptom even for patient {} in district {}", event.getPatient_id(), event.getDistrict());
 
         kafkaTemplate.send(TOPIC, event.getDistrict(), event);
     }

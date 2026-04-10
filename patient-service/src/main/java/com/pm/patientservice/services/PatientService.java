@@ -12,7 +12,7 @@ public class PatientService {
     public final PatientRepository patientRepository;
 
     public Patient createPatient(PatientRequest request) {
-        Patient patient = new Patient().builder()
+        Patient patient = Patient.builder()
                 .age(request.getAge())
                 .gender(request.getGender())
                 .district(request.getDistrict())
