@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: api-gateway
+  data:
+    redis:
+      host: localhost
+      port: 6379
   cloud:
     gateway:
       routes:
@@ -11,6 +15,12 @@ spring:
           uri: http://localhost:4005
           predicates:
             - Path=/api/auth/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                key-resolver: "#{@userKeyResolver}"
 
         - id: user-service-route
           uri: http://localhost:4005
@@ -18,12 +28,25 @@ spring:
             - Path=/api/users/**
           filters:
             - JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
+
+        - id: patient-service-route
+          uri: http://localhost:4001
+          predicates:
+            - Path=/api/patients/**, /api/symptoms/**
+          filters:
+            - JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
 
 application:
   security:
     jwt:
       secret-key: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-
-logging:
-  level:
-    org.springframework.cloud.gateway: INFO
