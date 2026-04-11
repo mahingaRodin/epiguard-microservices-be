@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaProducerService {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    private final KafkaTemplate<String, SymptomEvent> kafkaTemplate;
 
     private static final String TOPIC = "symptom-events";
 

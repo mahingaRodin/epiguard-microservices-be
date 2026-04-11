@@ -9,7 +9,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -37,7 +36,7 @@ class SymptomControllerTest {
                                   "symptoms": [
                                     {
                                       "type": "FEVER",
-                                      "severity": "HIGH"
+                                      "severity": 3
                                     }
                                   ]
                                 }
@@ -60,7 +59,7 @@ class SymptomControllerTest {
                                   "symptoms": [
                                     {
                                       "type": "COUGH",
-                                      "severity": "LOW"
+                                      "severity": 1
                                     }
                                   ]
                                 }
