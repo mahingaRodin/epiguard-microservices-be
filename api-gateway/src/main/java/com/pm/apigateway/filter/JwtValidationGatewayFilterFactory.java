@@ -37,15 +37,15 @@ public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFact
             String token = authHeader.substring(7);
 
             try {
-                SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+                SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
                 Claims claims = Jwts.parser()
                         .verifyWith(key)
                         .build()
                         .parseSignedClaims(token)
                         .getPayload();
-
                 exchange.getRequest().mutate()
-                        .header("X-User-Email", claims.getSubject())
+                        .header("X-User-Email", claims.get("email", String.class))
                         .build();
 
             } catch (Exception e) {
