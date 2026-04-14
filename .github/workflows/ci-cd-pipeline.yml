@@ -2,12 +2,13 @@ name: Epi-Guard Microservices CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-push-docker-images:
     name: Build & Push Images
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -15,8 +16,8 @@ jobs:
       - name: Set up JDK 23
         uses: actions/setup-java@v4
         with:
-          java-version: '23'
-          distribution: 'temurin'
+          java-version: "23"
+          distribution: "temurin"
           cache: maven
 
       - name: Build with Maven
@@ -24,6 +25,7 @@ jobs:
           mvn clean package -DskipTests -f api-gateway/pom.xml
           mvn clean package -DskipTests -f auth-service/pom.xml
           mvn clean package -DskipTests -f patient-service/pom.xml
+          mvn clean package -DskipTests -f triage-service/pom.xml
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -33,25 +35,30 @@ jobs:
 
       - name: Build and Push API Gateway
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/epi-gateway:latest ./api-gateway
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/epi-gateway:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-gateway:latest ./api-gateway
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-gateway:latest
 
       - name: Build and Push Auth Service
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/epi-auth:latest ./auth-service
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/epi-auth:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest ./auth-service
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest
 
       - name: Build and Push Patient Service
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/epi-patient:latest ./patient-service
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/epi-patient:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/patient-service:latest ./patient-service
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/patient-service:latest
+
+      - name: Build and Push Triage Service
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/triage-service:latest ./triage-service
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/triage-service:latest
 
   deploy-to-kamatera:
     name: Deploy to Kubernetes
     needs: build-and-push-docker-images
     runs-on: ubuntu-latest
-    steps:
 
+    steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -73,13 +80,9 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             echo "Successfully connected to Kamatera!"
-            
-            # Apply any changes you made to the YAML file automatically
             kubectl apply -f ~/epiguard-k8s/infrastructure.yaml
-            
-            # Restart the pods using the EXACT names from your infrastructure.yaml
             kubectl rollout restart deployment api-gateway
             kubectl rollout restart deployment auth-service
             kubectl rollout restart deployment patient-service
-            
-            echo "Deployment successful! The new code is now live."
+            kubectl rollout restart deployment triage-service
+            echo "Deployment successful!"
