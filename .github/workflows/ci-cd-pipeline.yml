@@ -51,6 +51,20 @@ jobs:
     needs: build-and-push-docker-images
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy K8s Blueprint to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          source: "infrastructure.yaml"
+          target: "~/epiguard-k8s/"
+          overwrite: true
+
       - name: Trigger Kubernetes Rolling Update
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -60,9 +74,12 @@ jobs:
           script: |
             echo "Successfully connected to Kamatera!"
             
-            # Tell Kubernetes to pull the new images and restart the pods smoothly
-            kubectl rollout restart deployment api-gateway-deployment
-            kubectl rollout restart deployment auth-service-deployment
-            kubectl rollout restart deployment patient-service-deployment
+            # Apply any changes you made to the YAML file automatically
+            kubectl apply -f ~/epiguard-k8s/infrastructure.yaml
+            
+            # Restart the pods using the EXACT names from your infrastructure.yaml
+            kubectl rollout restart deployment api-gateway
+            kubectl rollout restart deployment auth-service
+            kubectl rollout restart deployment patient-service
             
             echo "Deployment successful! The new code is now live."
