@@ -1,6 +1,3 @@
-# ==========================================
-# CONFIG MAPS (Postgres DB Initialization)
-# ==========================================
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,9 +8,6 @@ data:
     CREATE DATABASE triage_db;
 
 ---
-# ==========================================
-# INFRASTRUCTURE (Databases & Brokers)
-# ==========================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -180,9 +174,6 @@ spec:
       targetPort: 9092
 
 ---
-# ==========================================
-# MICROSERVICES
-# ==========================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
